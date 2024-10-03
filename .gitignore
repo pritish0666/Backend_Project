@@ -2,3 +2,4 @@
 .env
 /.env.local
 /notes.txt
+/orders.json
