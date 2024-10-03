@@ -15,6 +15,9 @@
 
     <button type="button" onclick="payNow()">Pay Now</button>
 
+    <h1>Send Invoice</h1>
+    <button id="sendInvoiceBtn">Send Invoice</button>
+
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <script>
@@ -84,6 +87,37 @@
         const rzp = new Razorpay(options);
         rzp.open();
       }
+      document.getElementById('sendInvoiceBtn').addEventListener('click', () => {
+    // Prepare the invoice data and email
+    const invoiceData = {
+        number: 'INV-002',
+        date: '2024-10-03',
+        customer: 'Jane Doe',
+        items: [
+            { description: 'Product X', price: 200 },
+            { description: 'Product Y', price: 300 }
+        ],
+    };
+
+    const email = 'pritishpatra29@example.com';
+
+    // Send POST request to backend API
+    fetch('http://localhost:8000/api/v1/email/send-invoice', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, invoiceData }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to send invoice.');
+    });
+});
     </script>
   </body>
 </html>

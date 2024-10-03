@@ -3,3 +3,4 @@
 /.env.local
 /notes.txt
 /orders.json
+/src/controllers/invoice.pdf

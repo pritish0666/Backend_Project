@@ -4,10 +4,7 @@ import cors from "cors";
 
 import path from "path";
 
-import {
-  createOrder,
-  verifyPayment,
-} from "./controllers/payment.controller.js";
+
 
 const app = express();
 app.use(
@@ -31,10 +28,11 @@ app.get("/", (req, res) => {
 //ROUTES IMPORT
 import userRoutes from "./routes/user.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import emailRoutes from "./routes/email.routes.js";
 
 //ROUTES
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/payment", paymentRoutes);
-
+app.use("/api/v1/email", emailRoutes);
 
 export { app };
