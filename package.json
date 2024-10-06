@@ -11,6 +11,7 @@
   "author": "Pritish Patra",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/recaptcha-enterprise": "^5.11.0",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.5.0",
     "cookie-parser": "^1.4.6",

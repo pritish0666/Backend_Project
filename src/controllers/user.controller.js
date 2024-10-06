@@ -4,6 +4,7 @@ import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utills/Cloudinary.js";
 import { ApiResponse } from "../utills/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import axios from "axios";
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
   try {
@@ -91,41 +92,74 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  // req body -> data
-  // username or email
-  //find the user
-  //password check
-  //access and referesh token
-  //send cookie
-
-  const { username, email, password } = req.body;
+  const { username, email, password, token } = req.body;
+  
 
   if (!username && !email) {
     throw new ApiError(400, "Username or email is required");
   }
 
+  //Verify the reCAPTCHA token
+  const verifyCaptcha = async (token) => {
+    const verifyUrl = "https://www.google.com/recaptcha/api/siteverify";
+    const secretKey = "6Lf8ElkqAAAAACMOK-yJ0HZyWSi63NKiUTiRe_oQ";
+
+    try {
+      const response = await axios.post(verifyUrl, null, {
+        params: {
+          secret: secretKey,
+          response: token,
+          remoteip: req.ip,
+        },
+      });
+
+      const { success } = response.data;
+      console.log("Captcha verification result:", response.data); // Add this to check response
+      if (!success) {
+        throw new ApiError(400, "Invalid reCAPTCHA token");
+      }
+    } catch (error) {
+      console.log("Error in CAPTCHA verification:", error); // Log error to console
+      throw new ApiError(400, "Failed to verify reCAPTCHA");
+    }
+  };
+
+  //Call the captcha verification function
+  await verifyCaptcha(token);
+
+  // Find the user
   const user = await User.findOne({
     $or: [{ username }, { email }],
   });
 
-  const passwordVerified = await user.isPasswordMatch(password);
+  if (!user) {
+    throw new ApiError(401, "User not found");
+  }
 
+  // Password check
+  const passwordVerified = await user.isPasswordMatch(password);
   if (!passwordVerified) {
     throw new ApiError(401, "Invalid credentials");
   }
 
+  // Generate access and refresh tokens
   const { accessToken, refreshToken } =
     await generateAccessTokenAndRefreshToken(user._id);
 
+  // Exclude password and refreshToken from the returned user object
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
 
+  // Set cookie options
   const options = {
     httpOnly: true,
     secure: true,
   };
 
+  console.log("Login successful for user:", loggedInUser); // Log successful login
+
+  // Send cookies and response
   return res
     .status(200)
     .cookie("refreshToken", refreshToken, options)
@@ -266,35 +300,34 @@ const updateProfile = asyncHandler(async (req, res) => {
 });
 
 const updateAvatar = asyncHandler(async (req, res) => {
-   const avatarLocalPath = req.file?.path;
+  const avatarLocalPath = req.file?.path;
 
-   if (!avatarLocalPath) {
-     throw new ApiError(400, "Avatar file is missing");
-   }
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "Avatar file is missing");
+  }
 
-   //delete old avatar (later)
+  //delete old avatar (later)
 
-   const avatar = await uploadOnCloudinary(avatarLocalPath);
+  const avatar = await uploadOnCloudinary(avatarLocalPath);
 
-   if (!avatar.url) {
-     throw new ApiError(400, "Error while uploading on avatar");
-   }
+  if (!avatar.url) {
+    throw new ApiError(400, "Error while uploading on avatar");
+  }
 
-   const user = await User.findByIdAndUpdate(
-     req.user?._id,
-     {
-       $set: {
-         avatar: avatar.url,
-       },
-     },
-     { new: true }
-   ).select("-password");
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        avatar: avatar.url,
+      },
+    },
+    { new: true }
+  ).select("-password");
 
-   return res
-     .status(200)
-     .json(new ApiResponse(200, user, "Avatar image updated successfully"));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Avatar image updated successfully"));
 });
-
 
 const updateCoverImage = asyncHandler(async (req, res) => {
   const coverImageLocalPath = req.file?.path;
@@ -302,7 +335,6 @@ const updateCoverImage = asyncHandler(async (req, res) => {
   if (!coverImageLocalPath) {
     throw new ApiError(400, "Cover image file is missing");
   }
-
 
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
@@ -324,7 +356,6 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, user, "Cover image updated successfully"));
 });
-
 
 const getUserProfile = asyncHandler(async (req, res) => {
   return res

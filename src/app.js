@@ -1,10 +1,7 @@
 import express, { urlencoded } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-
 import path from "path";
-
-
 
 const app = express();
 app.use(
@@ -34,5 +31,12 @@ import emailRoutes from "./routes/email.routes.js";
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/email", emailRoutes);
+
+app.post("/submit", (req, res) => {
+  const recaptchaResponse = req.body["g-recaptcha-response"];
+  if (!recaptchaResponse) {
+    return res.status(400).send("Invalid reCAPTCHA token");
+  }
+});
 
 export { app };

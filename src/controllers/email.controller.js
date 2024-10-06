@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "pritishpatra06@gmail.com",
-    pass: "process.env.EMAIL_PASS", 
+    pass: process.env.GMAIL_PASS,
   },
 });
 
@@ -25,7 +25,7 @@ async function sendInvoiceEmail(invoiceData, recipientEmail) {
     
     const mailOptions = {
       from: "pritishpatra06@gmail.com",
-      to: "pritishpatra29@gmail.com", 
+      to: recipientEmail, 
       subject: "Your Invoice",
       text: "Please find attached your invoice.",
       attachments: [

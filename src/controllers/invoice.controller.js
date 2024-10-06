@@ -14,6 +14,7 @@ function generateInvoice(invoiceData, filePath) {
     doc.text(`Date: ${invoiceData.date}`, 100, 140);
     doc.text(`Customer Name: ${invoiceData.customer}`, 100, 160);
 
+    
     // Add items table
     let itemsStartY = 200;
     invoiceData.items.forEach((item, index) => {
