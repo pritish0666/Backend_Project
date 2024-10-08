@@ -10,17 +10,23 @@
   <body>
     <h1>Login with CAPTCHA Verification</h1>
 
-<form id="loginForm" action="http://localhost:8000/api/v1/users/login" method="post">
-  <label for="email">Email or Username:</label>
-  <input type="text" id="email" name="username" required />
+    <form
+      id="loginForm"
+      action="http://localhost:8000/api/v1/users/login"
+      method="post"
+    >
+      <label for="email">Email or Username:</label>
+      <input type="text" id="email" name="username" required />
 
-  <label for="password">Password:</label>
-  <input type="password" id="password" name="password" required />
-  
-  <div class="g-recaptcha" data-sitekey="6Lf8ElkqAAAAAABJY75OZ71srUHq0vbhlWio2BLW"></div>
-  <button type="submit">Submit</button>
-</form>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required />
 
+      <div
+        class="g-recaptcha"
+        data-sitekey="6Lf8ElkqAAAAAABJY75OZ71srUHq0vbhlWio2BLW"
+      ></div>
+      <button type="submit">Submit</button>
+    </form>
 
     <hr />
 
@@ -144,34 +150,35 @@
               alert("Failed to send invoice.");
             });
         });
-      document.querySelector("#loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+      document
+        .querySelector("#loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-  const username = document.querySelector("#email").value;
-  const password = document.querySelector("#password").value;
+          const username = document.querySelector("#email").value;
+          const password = document.querySelector("#password").value;
 
-  const response = await fetch("/api/v1/users/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      username,  // or use 'email' if the form sends an email
-      password,
-      token: grecaptcha.getResponse(),  // if you are using Google reCAPTCHA
-    }),
-  });
+          const response = await fetch("/api/v1/users/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username, // or use 'email' if the form sends an email
+              password,
+              token: grecaptcha.getResponse(), // if you are using Google reCAPTCHA
+            }),
+          });
 
-  const data = await response.json();
-  console.log("Login response:", data);
+          const data = await response.json();
+          console.log("Login response:", data);
 
-  if (response.ok) {
-    console.log("Login successful");
-  } else {
-    console.log("Login failed");
-  }
-});
-
+          if (response.ok) {
+            console.log("Login successful");
+          } else {
+            console.log("Login failed");
+          }
+        });
     </script>
   </body>
 </html>

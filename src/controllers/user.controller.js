@@ -102,7 +102,7 @@ const loginUser = asyncHandler(async (req, res) => {
   //Verify the reCAPTCHA token
   const verifyCaptcha = async (token) => {
     const verifyUrl = "https://www.google.com/recaptcha/api/siteverify";
-    const secretKey = "6Lf8ElkqAAAAACMOK-yJ0HZyWSi63NKiUTiRe_oQ";
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
 
     try {
       const response = await axios.post(verifyUrl, null, {
