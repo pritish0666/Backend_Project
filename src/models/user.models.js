@@ -12,6 +12,12 @@ const userSchema = new Schema(
       trim: true,
       index: true,
     },
+    watchHistory: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Video",
+      },
+    ],
     email: {
       type: String,
       required: [true, "Email is required"],
